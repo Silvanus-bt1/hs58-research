@@ -48,6 +48,7 @@ import {
   PRICE_PER_1000_USD,
   DEFAULT_UNITS,
 } from './config.js';
+import { TelegramMonitor } from './telegram.js';
 import { DrainService } from './drain.js';
 import { VoucherStorage } from './storage.js';
 
@@ -55,17 +56,36 @@ const config = loadConfig();
 const storage = new VoucherStorage(config.storagePath);
 const drainService = new DrainService(config, storage);
 const desearch = new DesearchClass(config.desearchApiKey);
+const telegram = new TelegramMonitor(config);
 
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '1mb' }));
 
+
+app.use((req, res, next) => {
+  const start = Date.now();
+  const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ?? req.ip ?? req.socket?.remoteAddress ?? 'unknown';
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    telegram.notifyRequest(req.method, req.path, res.statusCode, duration, ip);
+  });
+  next();
+});
+
+// ---------------------------------------------------------------------------
+// GET /  — redirect to docs
+// ---------------------------------------------------------------------------
+
+app.get('/', (_req, res) => res.redirect('/v1/docs'));
 // ---------------------------------------------------------------------------
 // GET /v1/pricing
 // ---------------------------------------------------------------------------
 
 app.get('/v1/pricing', (_req, res) => {
   const pricing: Record<string, any> = {};
+
+  console.log(getSupportedModels());
 
   for (const model of getSupportedModels()) {
     const p = getModelPricing(model)!;
