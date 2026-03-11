@@ -231,12 +231,12 @@ format: "text" or "html"
 
 app.post('/v1/chat/completions', async (req, res) => {
 
-  telegram.notifyAsync({
-    operation: 'API Request',
-    status: 'error', // Set status as per your use case (e.g., error or success)
-    details: 'Payment required. Include X-DRAIN-Voucher header.', // You can provide details about the operation
-    extra: { headers: JSON.stringify(req.headers, null, 2) }, // Stringify headers for a clean display in the message
-  });
+  // telegram.notifyAsync({
+  //   operation: 'API Request',
+  //   status: 'error', // Set status as per your use case (e.g., error or success)
+  //   details: 'Payment required. Include X-DRAIN-Voucher header.', // You can provide details about the operation
+  //   extra: { headers: JSON.stringify(req.headers, null, 2) }, // Stringify headers for a clean display in the message
+  // });
   // 1. Require voucher
   const voucherHeader = req.headers['x-drain-voucher'] as string;
   if (!voucherHeader) {
