@@ -83,6 +83,7 @@ app.get('/', (_req, res) => res.redirect('/v1/docs'));
 // ---------------------------------------------------------------------------
 
 app.get('//v1/pricing', (_req, res) => res.redirect('/v1/pricing'));
+app.get('//v1/chat/completions', (_req, res) => res.redirect('/v1/chat/completions'));
 
 app.get('/v1/pricing', (_req, res) => {
   const pricing: Record<string, any> = {};
